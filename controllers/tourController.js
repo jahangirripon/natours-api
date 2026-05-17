@@ -2,26 +2,32 @@ const Tour = require('../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   try {
-    console.log(req.query);
-
+    // console.log(req.query);
     // FILTERING
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'limit', 'sort', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
-
     // ADVANCED FILTERING
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b{gte|gt|lte|lt}\b/g, (match) => `$${match}`);
-    console.log(JSON.parse(queryStr));
-    const query = Tour.find(JSON.parse(queryStr));
-    const tours = await query;
+    // console.log(JSON.parse(queryStr));
+    let query = Tour.find(JSON.parse(queryStr));
     // console.log(req.query);
-    // GET /api/v1/tours?duration[lte]=3 200 74.976 ms - 930
-    // { duration: { lte: '4' } }
-    // { duration: { '$lte': '4' } }
     // GET /api/v1/tours?duration[lte]=4 200 74.738 ms - 1809
     // { price: { lte: '800' } }
     // { price: { '$lte': '800' } }
+
+    //SORT
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' '); //127.0.0.1:3000/api/v1/tours?sort=price,ratingsAverage
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
+    // ascending and descending
+    // 127.0.0.1:3000/api/v1/tours?sort=-price
+    // EXECUTE QUERY
+    const tours = await query;
 
     res.status(200).json({
       status: 'success',
