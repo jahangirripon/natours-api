@@ -26,6 +26,14 @@ exports.getAllTours = async (req, res) => {
     }
     // ascending and descending
     // 127.0.0.1:3000/api/v1/tours?sort=-price
+
+    // 3. field limiting (127.0.0.1:3000/api/v1/tours?fields=name, price, duration)
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
     // EXECUTE QUERY
     const tours = await query;
 
