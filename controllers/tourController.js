@@ -69,10 +69,11 @@ exports.getAllTours = async (req, res) => {
         tours: tours,
       },
     });
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     res.status(400).json({
       status: 'fail',
-      error: error,
+      message: err.message,
     });
   }
 };
@@ -96,10 +97,11 @@ exports.createTour = async (req, res) => {
         tour: newTour,
       },
     });
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     res.status(400).json({
       status: 'fail',
-      message: error,
+      message: err.message,
     });
   }
 };
