@@ -52,6 +52,10 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, 'A tour must have a image'],
     },
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
     images: [String],
     createdAt: {
       type: Date,
@@ -73,6 +77,16 @@ tourSchema.virtual('durationWeeks').get(function () {
 tourSchema.pre('save', async function () {
   this.slug = slugify(this.name, { lower: true });
   // next();
+});
+
+// query MW
+tourSchema.pre('find', async function () {
+  this.find({ secretTour: { $ne: true } });
+});
+
+// aggregation MW
+tourSchema.pre('aggregate', async function () {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
 });
 
 // tourSchema.pre('save', function (next) {
