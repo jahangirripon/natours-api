@@ -20,8 +20,20 @@ mongoose
 // dotenv.config({ path: './config.env' });
 // dotenv.config({ path: './config.end' });
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App started on port ${port}`);
 });
 
-//test
+process.on('unhandledRejection', (err) => {
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit();
+  });
+});
+
+process.on('uncaughtException', (err) => {
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit();
+  });
+});
