@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-const slugify = require('slugify');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
+
 //name, email, photo, password, passwordconfirm
 const userSchema = new mongoose.Schema({
   name: {
@@ -10,10 +11,6 @@ const userSchema = new mongoose.Schema({
     trim: true,
     maxlength: [40, 'Must max 40 chars'],
     minlength: [10, 'Must min 10 chars'],
-    // validate: [
-    //   validator.isAlpha,
-    //   'User name must only contain chars and no spaces',
-    // ],
   },
   email: {
     type: String,
@@ -32,6 +29,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'A user must have a mail'],
     minlength: [10, 'Must min 10 chars'],
+    validate: {
+      validator: function (el) {
+        return el === this.password;
+      },
+      message: 'Password are not same ',
+    },
   },
   photo: [String],
   createdAt: {
@@ -40,13 +43,10 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.virtual('durationWeeks').get(function () {
-  return this.duration / 7;
-});
-
-//document MW runs before .save() and .create()
-userSchema.pre('save', async function () {
-  this.slug = slugify(this.name, { lower: true });
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
   // next();
 });
 
