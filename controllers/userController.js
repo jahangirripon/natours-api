@@ -1,9 +1,16 @@
-const fs = require('fs');
-const users = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/users.json`),
-);
+const User = require('../models/userModel');
+const APIFeatures = require('../utils/apiFeatures');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
-exports.getAllUsers = (req, res) => {
+// const fs = require('fs');
+// const users = JSON.parse(
+//   fs.readFileSync(`${__dirname}/../dev-data/data/users.json`),
+// );
+
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find();
+
   res.status(200).json({
     status: 'success',
     result: users.length,
@@ -11,7 +18,7 @@ exports.getAllUsers = (req, res) => {
       users: users,
     },
   });
-};
+});
 
 exports.getUser = (req, res) => {
   // console.log(req.params);
