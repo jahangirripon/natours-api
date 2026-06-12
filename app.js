@@ -8,6 +8,10 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 app.use(express.static(`${__dirname}/public`));
 app.use(express.json());
+app.use((req, res, next) => {
+  // console.log(req.headers);
+  next();
+});
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
@@ -24,6 +28,8 @@ app.all('*', (req, res, next) => {
   // err.status = 'fail';
   // err.statusCode = 404;
   // next(err);
+  console.log(req.headers);
+
   next(new AppError(`Can't find ${req.originalUrl} on this server`));
 });
 
