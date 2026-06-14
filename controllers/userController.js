@@ -46,12 +46,14 @@ exports.getUser = (req, res) => {
 };
 
 exports.createUser = (req, res) => {
-  // console.log(req.body); // raw -> json; MW => app.use(express.json());
+  console.log(req.body); // raw -> json; MW => app.use(express.json());
   // console.log(res);
 
   const newId = users[users.length - 1].id + 1;
   const newUser = Object.assign({ id: newId }, req.body);
   users.push(newUser);
+  console.log(req.body);
+  console.log(newUser);
   fs.writeFile(
     `${__dirname}/dev-data/data/users-simple.json`,
     JSON.stringify(users),
