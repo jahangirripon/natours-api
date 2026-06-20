@@ -13,6 +13,18 @@ const signToken = (id) => {
   });
 };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (req, res) => {
   // const newUser = await User.create(req.body);
 
@@ -24,15 +36,17 @@ exports.signup = catchAsync(async (req, res) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
-  const token = signToken(newUser._id);
+  createSendToken(newUser, 201, res); //replaced below code
 
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  // const token = signToken(newUser._id);
+
+  // res.status(201).json({
+  //   status: 'success',
+  //   token,
+  //   data: {
+  //     user: newUser,
+  //   },
+  // });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -47,11 +61,12 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password!', 401));
   }
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res); //replaced below code
+  // const token = signToken(user._id);
+  // res.status(200).json({
+  //   status: 'success',
+  //   token,
+  // });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -145,11 +160,27 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
+  createSendToken(user, 200, res); //replaced below code
 
-  const token = signToken(user._id);
+  // const token = signToken(user._id);
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  // res.status(200).json({
+  //   status: 'success',
+  //   token,
+  // });
+});
+
+// update logged in users password
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select('+password');
+
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('No user found!', 400));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  createSendToken(user, 200, res);
 });
