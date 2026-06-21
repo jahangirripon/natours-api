@@ -133,3 +133,15 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  const deletedUser = await User.findByIdAndUpdate(req.user.id, {
+    active: false,
+  });
+  res.status(200).json({
+    data: {
+      user: deletedUser,
+      hdhdd: 'jdgfjfg',
+    },
+  });
+});
