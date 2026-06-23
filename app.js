@@ -1,20 +1,33 @@
 const express = require('express');
 const morgan = require('morgan');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
 const app = express();
+
 app.use(express.static(`${__dirname}/public`));
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 app.use((req, res, next) => {
   // console.log(req.headers);
   next();
 });
+app.use(helmet());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+const limiter = rateLimit({
+  max: 5,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP',
+});
+
+app.use('/api', limiter);
+
 // mounting ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
