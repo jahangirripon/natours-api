@@ -12,7 +12,7 @@ mongoose
   });
 
 // READ JSON FILE
-const tours = JSON.parse(fs.readFileSync('./data/tours-simple.json', 'utf-8'));
+const tours = JSON.parse(fs.readFileSync('./data/tours.json', 'utf-8'));
 
 //IMPORT DATA TO DB
 const importData = async () => {
@@ -36,6 +36,7 @@ const deleteData = async () => {
   }
 };
 // kpax@DESKTOP-H4NRTIT MINGW64 /d/laragon/www/repl/node/express/dev-data
+// cd into dev-data
 // node import-data.js --delete
 // node import-data.js --import
 if (process.argv[2] === '--import') {
