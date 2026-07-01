@@ -132,6 +132,13 @@ tourSchema.pre('save', async function () {
   // next();
 });
 
+tourSchema.pre(/^find/, async function () {
+  this.populate({
+    path: 'guides',
+    select: '-__v -createdAt',
+  });
+});
+
 // tourSchema.pre('save', async function () {
 //   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
 //   this.guides = await Promise.all(guidesPromises);
