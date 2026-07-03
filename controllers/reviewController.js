@@ -1,0 +1,93 @@
+const Review = require('../models/reviewModel');
+const APIFeatures = require('../utils/apiFeatures');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
+
+exports.getAllReviews = async (req, res) => {
+  try {
+    // EXECUTE QUERY
+    const features = new APIFeatures(Review.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const reviews = await features.query;
+    //const tours = await query;
+
+    res.status(200).json({
+      status: 'success',
+      result: reviews.length,
+      data: {
+        reviews: reviews,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
+};
+
+exports.getReview = catchAsync(async (req, res, next) => {
+  const review = await Review.findById(req.params.id);
+
+  if (!review) {
+    return next(new AppError('No Review Found!', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    data: {
+      review: review,
+    },
+  });
+});
+
+exports.createReview = catchAsync(async (req, res, next) => {
+  const newReview = await Review.create(req.body);
+  res.status(201).json({
+    status: 'success',
+    data: {
+      review: newReview,
+    },
+  });
+});
+
+exports.updateReview = async (req, res) => {
+  try {
+    const review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      data: {
+        review: review,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      data: {
+        status: 'Fail!',
+        message: error,
+      },
+    });
+  }
+};
+
+exports.deleteReview = async (req, res) => {
+  try {
+    const review = await review.findByIdAndDelete(req.params.id);
+    res.status(200).json({
+      data: {
+        review: review,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      data: {
+        status: 'Fail!',
+        message: error,
+      },
+    });
+  }
+};
