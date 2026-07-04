@@ -38,12 +38,12 @@ const reviewSchema = new mongoose.Schema(
   },
 );
 
-reviewSchema.pre(/^find/, async function () {
-  this.populate({
-    path: 'tour',
-    select: 'name',
-  });
-});
+// reviewSchema.pre(/^find/, async function () {
+//   this.populate({
+//     path: 'tour',
+//     select: 'name',
+//   });
+// });
 
 reviewSchema.pre(/^find/, async function () {
   this.populate({
