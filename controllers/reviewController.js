@@ -2,6 +2,7 @@ const Review = require('../models/reviewModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 // exports.getAllReviews = async (req, res) => {
 //   try {
@@ -92,20 +93,21 @@ exports.updateReview = async (req, res) => {
   }
 };
 
-exports.deleteReview = async (req, res) => {
-  try {
-    const review = await review.findByIdAndDelete(req.params.id);
-    res.status(200).json({
-      data: {
-        review: review,
-      },
-    });
-  } catch (error) {
-    res.status(404).json({
-      data: {
-        status: 'Fail!',
-        message: error,
-      },
-    });
-  }
-};
+exports.deleteReview = factory.deleteOne(Review);
+// exports.deleteReview = async (req, res) => {
+//   try {
+//     const review = await review.findByIdAndDelete(req.params.id);
+//     res.status(200).json({
+//       data: {
+//         review: review,
+//       },
+//     });
+//   } catch (error) {
+//     res.status(404).json({
+//       data: {
+//         status: 'Fail!',
+//         message: error,
+//       },
+//     });
+//   }
+// };
