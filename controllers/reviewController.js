@@ -3,31 +3,47 @@ const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-exports.getAllReviews = async (req, res) => {
-  try {
-    // EXECUTE QUERY
-    const features = new APIFeatures(Review.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-    const reviews = await features.query;
-    //const tours = await query;
+// exports.getAllReviews = async (req, res) => {
+//   try {
+//     // EXECUTE QUERY
+//     // const features = new APIFeatures(Review.find(), req.query)
+//     //   .filter()
+//     //   .sort()
+//     //   .limitFields()
+//     //   .paginate();
+//     // const reviews = await features.query;
+//     //const tours = await query;
+//     let filter = {};
+//     if (req.param.tourId) filter = { tour: req.params.tourId };
+//     const reviews = await Review.find(filter);
 
-    res.status(200).json({
-      status: 'success',
-      result: reviews.length,
-      data: {
-        reviews: reviews,
-      },
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message,
-    });
-  }
-};
+//     res.status(200).json({
+//       status: 'success',
+//       result: reviews.length,
+//       data: {
+//         reviews: reviews,
+//       },
+//     });
+//   } catch (err) {
+//     res.status(400).json({
+//       status: 'fail',
+//       message: err.message,
+//     });
+//   }
+// };
+
+exports.getAllReviews = catchAsync(async (req, res) => {
+  let filter;
+  if (req.params.tourId) filter = { tour: req.params.tourId };
+  const reviews = await Review.find(filter);
+  res.status(200).json({
+    status: 'success',
+    result: reviews.length,
+    data: {
+      reviews: reviews,
+    },
+  });
+});
 
 exports.getReview = catchAsync(async (req, res, next) => {
   const review = await Review.findById(req.params.id);
